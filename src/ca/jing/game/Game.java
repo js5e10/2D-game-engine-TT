@@ -15,6 +15,7 @@ import ca.jing.game.gfx.Colours;
 import ca.jing.game.gfx.Font;
 import ca.jing.game.gfx.Screen;
 import ca.jing.game.gfx.SpriteSheet;
+import ca.jing.game.level.Level;
 
 public class Game extends Canvas implements Runnable{
 	public static final int WIDTH=160;
@@ -36,6 +37,7 @@ public class Game extends Canvas implements Runnable{
 	private Screen screen;
 	
 	public InputHandler input;
+	public Level level;
 	
 	public Game(){
 		setMinimumSize(new Dimension(WIDTH*SCALE, HEIGHT*SCALE));
@@ -62,14 +64,15 @@ public class Game extends Canvas implements Runnable{
 					int bb=(b*255/5);
 					
 					colours[index++]=rr<<16|gg<<8|bb;
-					
+					level=new Level(64,64);
 				}
 			}
 		}
 		
 		Colours.get(555,505,055,555);
-		screen=new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet_test.png"));
+		screen=new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet_test2.png"));
 		input=new InputHandler(this);
+		
 	}
 	public synchronized void start() {
 		// TODO Auto-generated method stub
@@ -121,26 +124,26 @@ public class Game extends Canvas implements Runnable{
 	    
 		}
 	}
+	private int x=0, y=0;
 	
 	public void tick(){
 		tickCount++;
 		
-		if (input.up.isPressed()){
-			screen.yOffset--;
-		}
-		if (input.down.isPressed()){
-			screen.yOffset++;
-		}
+		if (input.up.isPressed())y-=1;
+		
+		if (input.down.isPressed())	y+=1;
+	
 		if (input.left.isPressed()){
-			screen.xOffset--;
+			x-=1;
 		}
 		if (input.right.isPressed()){
-			screen.xOffset++;
+			x+=1;
 		}
 		
-		for (int i =0 ; i<pixels.length; i++){
-			pixels[i]=i+tickCount;
-		}
+		//for (int i =0 ; i<pixels.length; i++){
+		//	pixels[i]=i+tickCount;
+		//}
+		level.tick();
 	}
 	public void render(){
 		BufferStrategy bs=getBufferStrategy();
@@ -149,19 +152,37 @@ public class Game extends Canvas implements Runnable{
 			return;
 		}
 		
-		//screen.render(pixels,0, WIDTH);
-		for(int y=0; y<32;y++){
-			for(int x=0;x<32;x++){
-				boolean flipX=x%2==1;
-				boolean flipY=y%2==1;
-				
-				screen.render(x<<3, y<<3, 0, Colours.get(555, 505, 055, 550),flipX, flipY );
-				
-			}
-		}
-		String msg="This is our game!";
+		//int xOffset=screen.xOffset;
+		//int yOffset=screen.yOffset;
 		
-		Font.render(msg, screen, screen.xOffset+screen.width/2-(msg.length()*8/2), screen.yOffset+screen.height/2, Colours.get(-1, -1, -1, 000));
+		int xOffset=x-(screen.width/2);
+		int yOffset=y-(screen.height/2);
+		
+		level.renderTiles(screen, xOffset, yOffset);
+		//screen.render(pixels,0, WIDTH);
+		//for(int y=0; y<32;y++){
+		//	for(int x=0;x<32;x++){
+			//	boolean flipX=x%2==1;
+			//	boolean flipY=y%2==1;
+				
+			//	screen.render(x<<3, y<<3, 0, Colours.get(555, 505, 055, 550),flipX, flipY );
+				
+		//	}
+	//	}
+	//	String msg="This is our game!";
+		
+		//Font.render(msg, screen, screen.xOffset+screen.width/2-(msg.length()*8/2), screen.yOffset+screen.height/2, Colours.get(-1, -1, -1, 000));
+		for (int x = 0; x < level.width; x++) {
+            int colour = Colours.get(-1, -1, -1, 000);
+            if (x % 10 == 0 && x != 0) {
+                    colour = Colours.get(-1, -1, -1, 500);
+            }
+            Font.render((x % 10) + "", screen, 0 + (x * 8), 0, colour);
+    }
+		
+		
+		
+		
 		
 		for(int y=0; y<screen.height;y++){
 			for(int x=0;x<screen.width;x++){
