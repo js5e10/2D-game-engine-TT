@@ -1,14 +1,18 @@
 package ca.jing.game.level;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ca.jing.game.gfx.Colours;
 import ca.jing.game.gfx.Screen;
 import ca.jing.game.level.tiles.Tile;
-
+import ca.jing.game.entities.Entity;;
 public class Level {
 	
 	private byte[] tiles;
 	public int width;
 	public int height;
+	public List<Entity> entities=new ArrayList<Entity>();
 	
 	public Level(int width, int height){
 		tiles=new byte[width*height];
@@ -34,6 +38,9 @@ public class Level {
 	
 	public void tick(){
 		
+		for (Entity e : entities){
+			e.tick();
+		}
 		
 	}
 	
@@ -53,11 +60,24 @@ public class Level {
      }
 }
 
+	
+	public void renderEntities(Screen screen){
+		for (Entity e : entities){
+			e.render(screen);
+			
+		}
+		
+		
+	}
 	private Tile getTile(int x, int y) {
 		if (x<0||x>width || 0>y||y>height) return Tile.VOID;
 		
 		
 		return Tile.tiles[tiles[x+y*width]];
+	}
+	
+	public void addEntity(Entity entity){
+		this.entities.add(entity);
 	}
 
 }
