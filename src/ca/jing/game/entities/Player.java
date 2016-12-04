@@ -8,6 +8,7 @@ import ca.jing.game.level.Level;
 public class Player extends Mob{
 	private InputHandler input;
 	private int colour=Colours.get(-1, 111, 145, 543);
+	private int scale=1;
 	public Player(Level level, int x, int y, InputHandler input) {
 		super(level, "player", x, y, 1);
 		this.input=input;
@@ -43,6 +44,7 @@ public class Player extends Mob{
 		}else{
 			isMoving =false;
 		}
+		this.scale=2;
 		
 	}
 
@@ -54,10 +56,10 @@ public class Player extends Mob{
 		int xOffset=x-modifier/2;
 		int yOffset=y-modifier/2-4;
 		
-		screen.render(xOffset, yOffset, xTile+yTile*32,colour, 0x00);
-		screen.render(xOffset+modifier, yOffset, (xTile+1)+yTile*32,colour, 0x00);
-		screen.render(xOffset, yOffset+modifier, xTile+(yTile+1)*32,colour, 0x00);
-		screen.render(xOffset+modifier, yOffset+modifier, (xTile+1)+(yTile+1)*32,colour, 0x00);
+		screen.render(xOffset, yOffset, xTile+yTile*32,colour, 0x00, scale);
+		screen.render(xOffset+modifier, yOffset, (xTile+1)+yTile*32,colour, 0x00, scale);
+		screen.render(xOffset, yOffset+modifier, xTile+(yTile+1)*32,colour, 0x00, scale);
+		screen.render(xOffset+modifier, yOffset+modifier, (xTile+1)+(yTile+1)*32,colour, 0x00,scale);
 		
 		
 	}
