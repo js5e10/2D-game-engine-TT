@@ -74,7 +74,7 @@ public class Game extends Canvas implements Runnable{
 		}
 		
 		Colours.get(555,505,055,555);
-		screen=new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet_test3.png"));
+		screen=new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet.png"));
 		input=new InputHandler(this);
 		level=new Level(64,64);
 		player=new Player(level, 0 ,0, input);
