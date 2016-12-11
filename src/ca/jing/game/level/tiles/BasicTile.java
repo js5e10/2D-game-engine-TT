@@ -18,6 +18,12 @@ public class BasicTile extends Tile{
 		screen.render(x,y,tileId,tileColour,0x00,1);
 		
 	}
+
+	@Override
+	public void tick() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 
 }
