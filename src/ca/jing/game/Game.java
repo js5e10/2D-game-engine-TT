@@ -68,7 +68,7 @@ public class Game extends Canvas implements Runnable{
 					int bb=(b*255/5);
 					
 					colours[index++]=rr<<16|gg<<8|bb;
-					level=new Level(64,64);
+					
 				}
 			}
 		}
@@ -76,7 +76,7 @@ public class Game extends Canvas implements Runnable{
 		Colours.get(555,505,055,555);
 		screen=new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet.png"));
 		input=new InputHandler(this);
-		level=new Level(64,64);
+		level=new Level("/levels/small_test_level.png");
 		player=new Player(level, 0 ,0, input);
 		level.addEntity(player);
 	}
