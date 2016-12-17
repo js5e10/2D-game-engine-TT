@@ -10,6 +10,7 @@ import java.awt.image.BufferStrategy;
 
 import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import ca.jing.game.entities.Player;
 import ca.jing.game.gfx.Colours;
@@ -17,6 +18,9 @@ import ca.jing.game.gfx.Font;
 import ca.jing.game.gfx.Screen;
 import ca.jing.game.gfx.SpriteSheet;
 import ca.jing.game.level.Level;
+import ca.jing.game.net.GameClient;
+import ca.jing.game.net.GameServer;
+import ca.jing.game.net.packets.Packet00Login;
 
 public class Game extends Canvas implements Runnable{
 	public static final int WIDTH=160;
@@ -40,6 +44,9 @@ public class Game extends Canvas implements Runnable{
 	public InputHandler input;
 	public Level level;
 	public Player player;
+	
+	private GameClient socketClient;
+	private GameServer socketServer;
 	
 	
 	
@@ -77,13 +84,24 @@ public class Game extends Canvas implements Runnable{
 		screen=new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet.png"));
 		input=new InputHandler(this);
 		level=new Level("/levels/water_test_level.png");
-		player=new Player(level, 0 ,0, input);
-		level.addEntity(player);
+		//player=new Player(level, 0 ,0, input, JOptionPane.showInputDialog(this, "please enter a username"));
+		//level.addEntity(player);
+		//socketClient.sendData("ping".getBytes());
+		Packet00Login loginPacket = new Packet00Login(JOptionPane.showInputDialog(this, "please enter a username"));
+		loginPacket.writeData(socketClient);
 	}
 	public synchronized void start() {
 		// TODO Auto-generated method stub
 		running=true;
 		new Thread(this).start();
+		
+		if(JOptionPane.showConfirmDialog(this, "Do you want to run the server")==0){
+			socketServer = new GameServer(this);
+			socketServer.start();
+			
+		}
+		socketClient=new GameClient(this, "localhost");
+		socketClient.start();
 	}
 	public synchronized void stop(){
 		running=false;
@@ -122,6 +140,7 @@ public class Game extends Canvas implements Runnable{
 	       if(System.currentTimeMillis()-lastTimer>=1000){
 	    	   lastTimer+=1000;
 	    	   /*System.out.println(ticks+ "," + frames);*/
+	    	   frame.setTitle(ticks+ " ticks, " + frames + "frames");
 	    	   frames=0;
 	    	   ticks=0;
 	    
