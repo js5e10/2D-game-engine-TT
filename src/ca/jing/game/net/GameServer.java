@@ -47,7 +47,7 @@ public class GameServer extends Thread{
 				e.printStackTrace();
 			}
 			
-			parsePacket(packet.getData(), packet.getAddress(), packet.getPort());
+			this.parsePacket(packet.getData(), packet.getAddress(), packet.getPort());
 //			String message=new String(packet.getData());
 //			System.out.println("ClIENT[" + packet.getAddress().getHostAddress()+ ":" + packet.getPort() +"]>" + message);
 //			if (message.trim().equalsIgnoreCase("ping")){
@@ -62,26 +62,56 @@ public class GameServer extends Thread{
 	
 	private void parsePacket(byte[] data, InetAddress address, int port) {
 		String message = new String(data).trim();
-		PacketTypes type=Packet.lookupPacket(message.substring(0,2));	
+		PacketTypes type=Packet.lookupPacket(message.substring(0,2));
+		Packet packet=null;
 		switch(type){
 		case INVALID:
 			break;
 			
 		case LOGIN:
-			Packet00Login packet= new Packet00Login(data);
-			System.out.println("[" + address.getHostAddress()+":"+ port+"]"+ packet.getUsername() + "has connected ...");
-			PlayerMP player=null;
-			if (address.getHostAddress().equalsIgnoreCase("127.0.0.1")){
-				player=new PlayerMP(game.level, 100, 100, game.input, packet.getUsername(),address,port);
-			}else{
-				player=new PlayerMP(game.level, 100, 100, game.input, packet.getUsername(),address,port);
-			}
-			if (player!=null){
-			this.connectedPlayers.add(player);
-			game.level.addEntity(player);
-			game.player=player;
-			}
+			//Packet00Login packet= new Packet00Login(data);
+			packet= new Packet00Login(data);
+			
+			System.out.println("[" + address.getHostAddress()+":"+ port+"]"+ ((Packet00Login)packet).getUsername() + "has connected ...");
+			PlayerMP player=new PlayerMP(game.level, 100, 100, ((Packet00Login)packet).getUsername(),address,port);;
+			//if (address.getHostAddress().equalsIgnoreCase("127.0.0.1")){
+			//	player=new PlayerMP(game.level, 100, 100, game.input, packet.getUsername(),address,port);
+			//}else{
+				
+			//}
+			this.addConnection(player, (Packet00Login)packet);
+			//if (player!=null){
+			//this.connectedPlayers.add(player);
+			//game.level.addEntity(player);
+			//game.player=player;
+			//}
 			break;
+		case DISCONNECT:
+			break;
+		}
+	}
+
+	public void addConnection(PlayerMP player, Packet00Login packet) {
+		boolean alreadyConnected=false;
+		for (PlayerMP p: this.connectedPlayers){
+			if(player.getUsername().equalsIgnoreCase(p.getUsername())){
+				if(p.ipAddress==null){
+					p.ipAddress=player.ipAddress;
+				}
+				
+				if(p.port==-1){
+					p.port=player.port;
+				}
+				alreadyConnected=true;
+			}else{
+				sendData(packet.getData(), p.ipAddress, p.port);
+				packet=new Packet00Login(p.getUsername());
+				sendData(packet.getData(), player.ipAddress,player.port);
+			}
+		}
+		if (!alreadyConnected){
+			this.connectedPlayers.add(player);
+			//packet.writeData(this);
 		}
 	}
 

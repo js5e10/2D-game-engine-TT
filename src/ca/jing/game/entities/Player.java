@@ -27,7 +27,7 @@ public class Player extends Mob{
 	public void tick() {
 		int xa=0;
 		int ya=0;
-		
+	if(input!=null)	{
 		
 		if (input.up.isPressed()) ya-=1;
 		
@@ -39,7 +39,7 @@ public class Player extends Mob{
 		if (input.right.isPressed()){
 			xa+=1;
 		}
-		
+	  }
 		if(xa!=0||ya!=0){
 			move(xa,ya);
 			isMoving = true;
@@ -141,4 +141,8 @@ public class Player extends Mob{
 		return false;
 	}
 
+	
+	public String getUsername(){
+		return this.username;
+	}
 }

@@ -8,6 +8,10 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import ca.jing.game.Game;
+import ca.jing.game.entities.PlayerMP;
+import ca.jing.game.net.packets.Packet;
+import ca.jing.game.net.packets.Packet00Login;
+import ca.jing.game.net.packets.Packet.PacketTypes;
 
 public class GameClient extends Thread {
 	
@@ -42,8 +46,9 @@ public class GameClient extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			String message=new String(packet.getData());
-			System.out.println("SERVER>" + message);
+			this.parsePacket(packet.getData(), packet.getAddress(), packet.getPort());
+			//String message=new String(packet.getData());
+			//System.out.println("SERVER>" + message);
 		}
 	}
 	
@@ -55,6 +60,36 @@ public class GameClient extends Thread {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	private void parsePacket(byte[] data, InetAddress address, int port) {
+		String message = new String(data).trim();
+		PacketTypes type=Packet.lookupPacket(message.substring(0,2));
+		Packet packet=null;
+		switch(type){
+		case INVALID:
+			break;
+			
+		case LOGIN:
+			//Packet00Login packet= new Packet00Login(data);
+			packet= new Packet00Login(data);
+			
+			System.out.println("[" + address.getHostAddress()+":"+ port+"]"+ ((Packet00Login)packet).getUsername() + "has joined game ...");
+			PlayerMP player=new PlayerMP(game.level, 100, 100, ((Packet00Login)packet).getUsername(),address,port);;
+			//if (address.getHostAddress().equalsIgnoreCase("127.0.0.1")){
+			//	player=new PlayerMP(game.level, 100, 100, game.input, packet.getUsername(),address,port);
+			//}else{
+				
+			//}
+			game.level.addEntity(player);
+			//if (player!=null){
+			//this.connectedPlayers.add(player);
+			//game.level.addEntity(player);
+			//game.player=player;
+			//}
+			break;
+		case DISCONNECT:
+			break;
 		}
 	}
 }
